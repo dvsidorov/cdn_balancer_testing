@@ -1,0 +1,7 @@
+pydantic
+sanic
+sanic-ext
+sanic-testing
+PyJWT
+aiomysql
+validators

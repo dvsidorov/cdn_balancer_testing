@@ -1,0 +1,46 @@
+#
+# https://www.cloudbooklet.com/how-to-install-nginx-and-lets-encrypt-with-docker-ubuntu-20-04/
+#
+
+version: "3.6"
+services:
+
+  balancer:
+    build: .
+    container_name: balancer.service
+    ports:
+      - "8000:8000"
+#    env_file:
+#      - .env
+    networks:
+      - balancer
+
+  db-mysql:
+    image: percona:5.7
+    container_name: balancer.db
+    ports:
+      - "3306:3306"
+    # задаем пароль для root пользователя
+    environment:
+      MYSQL_USER: balancer
+      MYSQL_PASSWORD: balancer
+      MYSQL_ROOT_PASSWORD: balancer
+      MYSQL_DATABASE: balancer_db
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - "./database/:/docker-entrypoint-initdb.d/"
+      - "dbdata:/var/lib/mysql"
+    networks:
+      - balancer
+
+volumes:
+  dbdata:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/srv/balancer.data'
+
+networks:
+  balancer:
+    name: balancer-network
