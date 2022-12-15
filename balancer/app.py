@@ -1,4 +1,3 @@
-import os
 from itertools import cycle
 
 from sanic import Sanic
@@ -9,7 +8,7 @@ from sanic_ext import validate
 from auth import login
 from config import config
 from helpers import prepare_cdn_video_url, connect_to_db, close_db_connection, update_cdn_config, init_config, \
-    get_cdn_config_repo, ping_cdn
+    get_cdn_config_repo, is_cdn_host
 from models import BalancerParams
 from repo import CDNConfigRepository
 
@@ -24,6 +23,7 @@ async def init_server(application, _):
     await init_config(application)
     await connect_to_db(application)
 
+    application.ctx.is_cdn_host = is_cdn_host(application)
     application.ctx.cdn_config_repo = CDNConfigRepository(application.ctx.db_connection)
     application.ext.add_dependency(CDNConfigRepository, get_cdn_config_repo)
 
@@ -43,7 +43,6 @@ async def stop_server(application, _):
 @app.route('/')
 @validate(query=BalancerParams)
 async def handler(request, query: BalancerParams):
-    for n in cycle(range(request.app.config.CDN_ORIGINS_RATIO)):
-        if n == request.app.config.CDN_ORIGINS_RATIO - 1:
-            return redirect(query.video, status=301)
+    if not next(request.app.ctx.is_cdn_host):
+        return redirect(query.video, status=301)
     return redirect(prepare_cdn_video_url(query.video, request.app.config.CDN_HOST), status=301)

@@ -14,6 +14,8 @@ services:
 #      - .env
     networks:
       - balancer
+    depends_on:
+      - db-mysql
 
   db-mysql:
     image: percona:5.7
@@ -28,18 +30,13 @@ services:
       MYSQL_DATABASE: balancer_db
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     volumes:
-      - "./database/:/docker-entrypoint-initdb.d/"
+      - "./database:/docker-entrypoint-initdb.d"
       - "dbdata:/var/lib/mysql"
     networks:
       - balancer
 
 volumes:
   dbdata:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/srv/balancer.data'
 
 networks:
   balancer:

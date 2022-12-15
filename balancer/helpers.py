@@ -1,5 +1,8 @@
 import asyncio
 import re
+from itertools import cycle
+
+from typing import Generator
 from urllib.parse import urlparse, urljoin
 
 from sanic.log import logger
@@ -16,8 +19,8 @@ def prepare_cdn_video_url(video_url: str, cdn_host: str = 'cdn.example.ru') -> s
     a = urlparse(video_url)
     b = video_server_name_pattern.findall(a.netloc)
     if not b:
-        raise ValueError('server name not found')
-    return urljoin(f'https://{cdn_host}', f'{b[0]}/{a.path}')
+        raise ValueError('Server name not found')
+    return urljoin(f'http://{cdn_host}', f'{b[0]}/{a.path}')
 
 
 async def connect_to_db(application: Sanic):
@@ -53,3 +56,10 @@ async def ping_cdn():
         await asyncio.sleep(5)
         ...
         logger.info('Check CDN')
+
+
+def is_cdn_host(application) -> Generator[bool, None, None]:
+    for i in cycle(range(application.config.CDN_ORIGINS_RATIO + 1)):
+        if i == application.config.CDN_ORIGINS_RATIO:
+            yield False
+        yield True

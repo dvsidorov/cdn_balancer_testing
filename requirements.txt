@@ -1,7 +1,7 @@
-pydantic
-sanic
-sanic-ext
-sanic-testing
-PyJWT
-aiomysql
-validators
+pydantic==1.10.2
+sanic==22.9.1
+sanic-ext==22.9.1
+sanic-testing==22.9.0
+PyJWT==2.6.0
+aiomysql==0.1.1
+validators==0.20.0
