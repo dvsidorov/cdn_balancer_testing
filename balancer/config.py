@@ -2,6 +2,7 @@ import os
 
 from sanic import Blueprint
 from sanic import json
+from sanic import Request
 from sanic_ext import validate
 
 from models import CDNConfig
@@ -27,7 +28,7 @@ config = Blueprint("config", url_prefix="/config")
 @config.route('/', methods=['POST'])
 @protected
 @validate(json=CDNConfig)
-async def config_create(request,
+async def config_create(request: Request,
                         body: CDNConfig,
                         cdn_config_repo: CDNConfigRepository):
     await cdn_config_repo.insert__cdn_settings(location=body.location, settings=body.settings)
@@ -37,7 +38,7 @@ async def config_create(request,
 @config.route('/', methods=['PUT'])
 @protected
 @validate(json=CDNConfig)
-async def config_update(request,
+async def config_update(request: Request,
                         body: CDNConfig,
                         cdn_config_repo: CDNConfigRepository):
     await cdn_config_repo.update__cdn_settings__by_location(location=body.location, settings=body.settings)
@@ -47,7 +48,7 @@ async def config_update(request,
 @config.route('/', methods=['DELETE'])
 @protected
 @validate(json=CDNConfig)
-async def config_delete(request,
+async def config_delete(request:Request,
                         body: CDNConfig,
                         cdn_config_repo: CDNConfigRepository):
     await cdn_config_repo.delete__cdn_settings__by_location(location=body.location)

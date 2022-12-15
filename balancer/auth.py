@@ -2,18 +2,19 @@ from functools import wraps
 
 import jwt
 from sanic import Blueprint
+from sanic import Request
 from sanic import text
 
 login = Blueprint("login", url_prefix="/login")
 
 
 @login.post("/")
-async def do_login(request):
+async def do_login(request: Request):
     token = jwt.encode({}, request.app.config.SECRET)
     return text(token)
 
 
-def check_token(request):
+def check_token(request: Request):
     if not request.token:
         return False
 
@@ -32,7 +33,6 @@ def protected(wrapped):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
             is_authenticated = check_token(request)
-
             if is_authenticated:
                 response = await f(request, *args, **kwargs)
                 return response

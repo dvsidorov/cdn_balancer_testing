@@ -12,12 +12,12 @@ from sanic import Sanic, Request
 from config import BalancerConfig
 from repo import CDNConfigRepository
 
-video_server_name_pattern = re.compile(r"^(s\d{1,3})\..+\.\w+$")
+VIDEO_SERVER_NAME_PATTERN = re.compile(r"^(s\d{1,3})\..+\.\w+$")
 
 
 def prepare_cdn_video_url(video_url: str, cdn_host: str = 'cdn.example.ru') -> str:
     a = urlparse(video_url)
-    b = video_server_name_pattern.findall(a.netloc)
+    b = VIDEO_SERVER_NAME_PATTERN.findall(a.netloc)
     if not b:
         raise ValueError('Server name not found')
     return urljoin(f'http://{cdn_host}', f'{b[0]}/{a.path}')
@@ -58,7 +58,7 @@ async def ping_cdn():
         logger.info('Check CDN')
 
 
-def is_cdn_host(application) -> Generator[bool, None, None]:
+def is_cdn_host(application: Sanic) -> Generator[bool, None, None]:
     for i in cycle(range(application.config.CDN_ORIGINS_RATIO + 1)):
         if i == application.config.CDN_ORIGINS_RATIO:
             yield False

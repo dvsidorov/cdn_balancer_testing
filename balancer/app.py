@@ -18,7 +18,7 @@ app.blueprint(config)
 
 
 @app.before_server_start
-async def init_server(application, _):
+async def init_server(application: Sanic, _):
     logger.info('Initialize server started')
     await init_config(application)
     await connect_to_db(application)
@@ -34,7 +34,7 @@ async def init_server(application, _):
 
 
 @app.before_server_stop
-async def stop_server(application, _):
+async def stop_server(application: Sanic, _):
     logger.info('Stop server started')
     await close_db_connection(application)
     logger.info('Stop server ended')
